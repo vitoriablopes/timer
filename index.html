@@ -2,456 +2,646 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Temporizador Visual</title>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Barlow:wght@400;600;700&family=Barlow+Condensed:wght@500;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Barlow:wght@400;600;700&family=Barlow+Condensed:wght@500;700&display=swap" rel="stylesheet" />
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     :root {
-      --bg: #0e0e0f;
-      --surface: #18181b;
-      --border: #2a2a30;
-      --text: #e8e8ec;
-      --muted: #6b6b78;
-      --fill: #4fffb0;
-      --radius: 14px;
+      --bg: #ffffff;
+      --surface: #ffffff;
+      --surface-soft: #f7f7f8;
+      --track: #f1f2f4;
+      --border: #e2e4e8;
+      --border-strong: #cfd3d8;
+      --text: #202124;
+      --muted: #747981;
+      --fill: #28d990;
+      --danger: #d64545;
+      --shadow: 0 8px 28px rgba(20, 24, 31, 0.08);
+      --radius: 16px;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      background: var(--bg);
     }
 
     body {
-      background: var(--bg);
       color: var(--text);
-      font-family: 'Barlow', sans-serif;
-      min-height: 100vh;
+      font-family: 'Barlow', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      min-height: 100svh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 36px;
-      padding: 40px 20px;
+      gap: 0;
+      padding: clamp(8px, 3vw, 20px);
+      overflow: auto;
     }
 
     h1 {
       font-family: 'Barlow Condensed', sans-serif;
       font-weight: 700;
-      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-size: clamp(1.15rem, 8vw, 2rem);
+      line-height: 1;
       letter-spacing: 0.02em;
       text-align: center;
       text-transform: uppercase;
+      color: var(--text);
     }
 
-    h1 span { color: var(--fill); transition: color 0.4s; }
+    h1 span {
+      color: var(--fill);
+      transition: color 0.4s;
+    }
 
     .panel {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 28px 32px;
+      box-shadow: var(--shadow);
+      padding: clamp(12px, 4vw, 22px);
       display: flex;
       flex-direction: column;
-      gap: 22px;
+      gap: clamp(10px, 2.5vh, 16px);
       width: min(420px, 100%);
     }
 
-    .hidden { display: none !important; }
+    .hidden {
+      display: none !important;
+    }
 
-    .row { display: flex; flex-direction: column; gap: 8px; }
+    .row {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-width: 0;
+    }
 
     label {
       font-family: 'Barlow Condensed', sans-serif;
-      font-size: 0.75rem;
+      font-size: clamp(0.68rem, 2.8vw, 0.78rem);
+      line-height: 1.1;
       text-transform: uppercase;
       letter-spacing: 0.12em;
       color: var(--muted);
     }
 
-    .toggle-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .toggle-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      min-width: 0;
+    }
 
     .toggle-btn {
-      background: transparent;
+      background: var(--surface-soft);
       border: 1.5px solid var(--border);
-      border-radius: 10px;
+      border-radius: 12px;
       color: var(--muted);
-      padding: 12px 10px;
+      padding: clamp(9px, 3vw, 12px) clamp(8px, 3vw, 10px);
       cursor: pointer;
       font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 600;
-      font-size: 0.95rem;
+      font-weight: 700;
+      font-size: clamp(0.8rem, 4vw, 0.95rem);
+      line-height: 1;
       letter-spacing: 0.05em;
       text-transform: uppercase;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      transition: all 0.2s;
+      gap: 8px;
+      transition: border-color 0.2s, color 0.2s, background 0.2s, transform 0.15s;
+      min-width: 0;
+      white-space: nowrap;
     }
-    .toggle-btn svg { flex-shrink: 0; }
-    .toggle-btn:hover { border-color: var(--fill); color: var(--text); }
+
+    .toggle-btn svg {
+      flex-shrink: 0;
+      width: 1.05em;
+      height: 1.05em;
+    }
+
+    .toggle-btn:hover {
+      border-color: var(--fill);
+      color: var(--text);
+    }
+
     .toggle-btn.active {
       border-color: var(--fill);
-      background: color-mix(in srgb, var(--fill) 10%, transparent);
+      background: rgba(40, 217, 144, 0.12);
       color: var(--text);
     }
 
     .num-input {
-      background: #111114;
+      background: var(--surface-soft);
       border: 1.5px solid var(--border);
-      border-radius: 10px;
+      border-radius: 12px;
       color: var(--text);
       font-family: 'Space Mono', monospace;
-      font-size: 1rem;
-      padding: 11px 16px;
+      font-size: clamp(0.9rem, 4vw, 1rem);
+      padding: clamp(9px, 3vw, 11px) clamp(12px, 4vw, 16px);
       width: 100%;
       outline: none;
-      transition: border-color 0.2s;
+      transition: border-color 0.2s, background 0.2s;
     }
-    .num-input:focus { border-color: var(--fill); }
-    .num-input::-webkit-inner-spin-button,
-    .num-input::-webkit-outer-spin-button { opacity: 1; }
 
-    .color-row { display: flex; align-items: center; gap: 14px; }
+    .num-input:focus {
+      border-color: var(--fill);
+      background: #ffffff;
+    }
+
+    .num-input::-webkit-inner-spin-button,
+    .num-input::-webkit-outer-spin-button {
+      opacity: 1;
+    }
+
+    .color-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
     .color-swatch {
-      width: 40px; height: 40px;
-      border-radius: 10px;
+      width: clamp(34px, 10vw, 40px);
+      height: clamp(34px, 10vw, 40px);
+      border-radius: 12px;
       border: 1.5px solid var(--border);
       cursor: pointer;
       overflow: hidden;
       flex-shrink: 0;
     }
-    .color-swatch input[type=color] {
-      width: 200%; height: 200%;
-      border: none; cursor: pointer;
+
+    .color-swatch input[type="color"] {
+      width: 200%;
+      height: 200%;
+      border: none;
+      cursor: pointer;
       transform: translate(-25%, -25%);
     }
-    .presets { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .presets {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+      min-width: 0;
+    }
+
     .preset {
-      width: 26px; height: 26px;
+      width: clamp(22px, 7.5vw, 26px);
+      height: clamp(22px, 7.5vw, 26px);
       border-radius: 50%;
       border: 2px solid transparent;
       cursor: pointer;
-      transition: transform 0.15s, border-color 0.15s;
+      transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
     }
-    .preset:hover { transform: scale(1.15); }
-    .preset.active { border-color: #fff; }
+
+    .preset:hover {
+      transform: scale(1.12);
+    }
+
+    .preset.active {
+      border-color: var(--text);
+      box-shadow: 0 0 0 2px #ffffff;
+    }
 
     .btn {
       background: var(--fill);
-      color: #000;
+      color: #0b0b0b;
       border: none;
-      border-radius: 10px;
+      border-radius: 12px;
       font-family: 'Barlow Condensed', sans-serif;
       font-weight: 700;
-      font-size: 1rem;
+      font-size: clamp(0.86rem, 4vw, 1rem);
+      line-height: 1;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      padding: 14px;
+      padding: clamp(11px, 3.5vw, 14px) clamp(10px, 3vw, 14px);
       cursor: pointer;
-      transition: opacity 0.2s, transform 0.15s;
+      transition: opacity 0.2s, transform 0.15s, border-color 0.2s, color 0.2s, background 0.2s;
+      white-space: nowrap;
     }
-    .btn:hover { opacity: 0.88; transform: translateY(-1px); }
-    .btn:active { transform: translateY(0); }
+
+    .btn:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
     .btn.danger {
-      background: transparent;
+      background: #ffffff;
       color: var(--muted);
       border: 1.5px solid var(--border);
     }
-    .btn.danger:hover { border-color: #ff5f5f; color: #ff5f5f; opacity: 1; }
 
-    .btn-row { display: flex; gap: 10px; }
-    .btn-row .btn { flex: 1; }
+    .btn.danger:hover {
+      border-color: var(--danger);
+      color: var(--danger);
+      opacity: 1;
+    }
 
-    /* ── Display ── */
-    #display { width: min(420px, 100%); display: none; flex-direction: column; align-items: center; gap: 18px; }
-    #display.visible { display: flex; }
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      min-width: 0;
+    }
+
+    .btn-row .btn {
+      flex: 1;
+      min-width: 0;
+    }
+
+    /* Display do timer */
+    #display {
+      width: min(420px, 100%);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(10px, 3vh, 18px);
+      min-width: 0;
+    }
+
+    #display.visible {
+      display: flex;
+    }
 
     .time-label {
       font-family: 'Space Mono', monospace;
-      font-size: clamp(1.2rem, 3.5vw, 1.7rem);
+      font-size: clamp(1.4rem, 12vw, 3rem);
       font-weight: 700;
-      letter-spacing: 0.06em;
-      color: var(--muted);
+      line-height: 1;
+      letter-spacing: 0.04em;
+      color: var(--text);
       text-align: center;
+      max-width: 100%;
     }
 
-    /* BAR */
-    #bar-wrap { width: 100%; display: none; flex-direction: column; gap: 10px; }
-    #bar-wrap.visible { display: flex; }
+    /* Barra */
+    #bar-wrap {
+      width: 100%;
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    #bar-wrap.visible {
+      display: flex;
+    }
 
     .bar-track {
       width: 100%;
-      height: 56px;
-      background: #111114;
+      height: clamp(28px, 14vw, 56px);
+      background: var(--track);
       border: 1.5px solid var(--border);
-      border-radius: 100px;
+      border-radius: 999px;
       overflow: hidden;
     }
+
     #bar-fill {
       height: 100%;
       width: 0%;
-      border-radius: 100px;
+      border-radius: 999px;
       background: var(--fill);
       transition: width 1s linear;
       position: relative;
     }
+
     #bar-fill::after {
       content: '';
       position: absolute;
       inset: 0;
-      background: linear-gradient(90deg, transparent 60%, rgba(255,255,255,0.12));
+      background: linear-gradient(90deg, transparent 60%, rgba(255, 255, 255, 0.28));
       border-radius: inherit;
     }
 
-    /* CIRCLE — pie */
-    #circle-wrap { display: none; flex-direction: column; align-items: center; gap: 10px; }
-    #circle-wrap.visible { display: flex; }
+    /* Círculo */
+    #circle-wrap {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+    }
+
+    #circle-wrap.visible {
+      display: flex;
+    }
+
+    #circle-svg {
+      width: min(62vmin, 240px, 100%);
+      height: auto;
+      display: block;
+    }
+
+    #circle-bg {
+      fill: var(--track);
+      stroke: var(--border);
+    }
 
     .pct {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.78rem;
-      color: var(--muted);
-      text-align: center;
+      display: none;
     }
 
     #done-msg {
       display: none;
       font-family: 'Barlow Condensed', sans-serif;
-      font-size: 1.3rem;
+      font-size: clamp(1rem, 5vw, 1.3rem);
       font-weight: 700;
+      line-height: 1;
       letter-spacing: 0.08em;
       text-transform: uppercase;
       color: var(--fill);
       animation: pulse 1s ease-in-out infinite alternate;
       text-align: center;
     }
-    #done-msg.visible { display: block; }
+
+    #done-msg.visible {
+      display: block;
+    }
 
     @keyframes pulse {
-      from { opacity: 0.5; }
-      to   { opacity: 1; }
+      from { opacity: 0.55; }
+      to { opacity: 1; }
+    }
+
+    @media (max-width: 300px) {
+      body {
+        padding: 8px;
+      }
+
+      .toggle-group,
+      .btn-row {
+        grid-template-columns: 1fr;
+        flex-direction: column;
+      }
+
+      .toggle-btn,
+      .btn {
+        white-space: normal;
+      }
+
+      .color-row {
+        align-items: flex-start;
+      }
+    }
+
+    @media (max-height: 420px) {
+      body {
+        justify-content: flex-start;
+        gap: 10px;
+      }
+
+
+      .panel {
+        gap: 10px;
+        padding: 12px;
+        box-shadow: none;
+      }
+
+      #display {
+        gap: 10px;
+      }
+
+      #circle-svg {
+        width: min(48vmin, 170px, 100%);
+      }
+
+      .bar-track {
+        height: clamp(24px, 11vw, 42px);
+      }
+    }
+
+    @media (max-height: 300px) {
+      #circle-svg {
+        width: min(42vmin, 130px, 100%);
+      }
+
+      .time-label {
+        font-size: clamp(1.2rem, 9vw, 2.2rem);
+      }
     }
   </style>
 </head>
 <body>
 
-<h1 id="page-title">Temporizador <span id="title-shape">Visual</span></h1>
 
-<div class="panel" id="config-panel">
-  <div class="row">
-    <label>Formato</label>
-    <div class="toggle-group">
-      <button class="toggle-btn active" id="btn-bar" onclick="selectShape('bar')">
-        <svg width="20" height="13" viewBox="0 0 20 13" fill="none">
-          <rect x="0.5" y="0.5" width="19" height="12" rx="6" stroke="currentColor"/>
-          <rect x="2.5" y="2.5" width="9" height="8" rx="4" fill="currentColor" opacity="0.5"/>
-        </svg>
-        Barra
-      </button>
-      <button class="toggle-btn" id="btn-circle" onclick="selectShape('circle')">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
-          <path d="M8 8 L8 1 A7 7 0 0 1 15 8 Z" fill="currentColor" opacity="0.5"/>
-        </svg>
-        Círculo
-      </button>
+  <div class="panel" id="config-panel">
+    <div class="row">
+      <div class="toggle-group" aria-label="Formato do temporizador">
+        <button class="toggle-btn active" id="btn-bar" onclick="selectShape('bar')">
+          <svg width="20" height="13" viewBox="0 0 20 13" fill="none" aria-hidden="true">
+            <rect x="0.5" y="0.5" width="19" height="12" rx="6" stroke="currentColor" />
+            <rect x="2.5" y="2.5" width="9" height="8" rx="4" fill="currentColor" opacity="0.5" />
+          </svg>
+          Barra
+        </button>
+        <button class="toggle-btn" id="btn-circle" onclick="selectShape('circle')">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5" />
+            <path d="M8 8 L8 1 A7 7 0 0 1 15 8 Z" fill="currentColor" opacity="0.5" />
+          </svg>
+          Círculo
+        </button>
+      </div>
+    </div>
+
+    <div class="row">
+      <label>Duração (minutos)</label>
+      <input type="number" class="num-input" id="minutes" value="5" min="0.1" step="0.5" placeholder="Ex: 25" />
+    </div>
+
+    <div class="row">
+      <div class="color-row" aria-label="Cor do preenchimento">
+        <div class="color-swatch">
+          <input type="color" id="color-picker" value="#28d990" oninput="updateColor(this.value)" aria-label="Escolher cor do preenchimento" />
+        </div>
+        <div class="presets" aria-label="Cores predefinidas">
+          <div class="preset active" style="background:#28d990" onclick="updateColor('#28d990', this)"></div>
+          <div class="preset" style="background:#ff6b6b" onclick="updateColor('#ff6b6b', this)"></div>
+          <div class="preset" style="background:#4dabf7" onclick="updateColor('#4dabf7', this)"></div>
+          <div class="preset" style="background:#ffd43b" onclick="updateColor('#ffd43b', this)"></div>
+          <div class="preset" style="background:#da77f2" onclick="updateColor('#da77f2', this)"></div>
+          <div class="preset" style="background:#ff9f43" onclick="updateColor('#ff9f43', this)"></div>
+          <div class="preset" style="background:#111111" onclick="updateColor('#111111', this)"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn" onclick="startTimer()">▶ Iniciar</button>
     </div>
   </div>
 
-  <div class="row">
-    <label>Duração (minutos)</label>
-    <input type="number" class="num-input" id="minutes" value="5" min="0.1" step="0.5" placeholder="Ex: 25"/>
-  </div>
+  <div id="display">
+    <div class="time-label" id="time-label">00:00</div>
 
-  <div class="row">
-    <label>Cor do preenchimento</label>
-    <div class="color-row">
-      <div class="color-swatch">
-        <input type="color" id="color-picker" value="#4fffb0" oninput="updateColor(this.value)"/>
-      </div>
-      <div class="presets">
-        <div class="preset active" style="background:#4fffb0" onclick="updateColor('#4fffb0',this)"></div>
-        <div class="preset" style="background:#ff6b6b" onclick="updateColor('#ff6b6b',this)"></div>
-        <div class="preset" style="background:#4dabf7" onclick="updateColor('#4dabf7',this)"></div>
-        <div class="preset" style="background:#ffd43b" onclick="updateColor('#ffd43b',this)"></div>
-        <div class="preset" style="background:#da77f2" onclick="updateColor('#da77f2',this)"></div>
-        <div class="preset" style="background:#ff9f43" onclick="updateColor('#ff9f43',this)"></div>
-        <div class="preset" style="background:#ffffff" onclick="updateColor('#ffffff',this)"></div>
-      </div>
+    <div id="bar-wrap">
+      <div class="bar-track"><div id="bar-fill"></div></div>
+      <div class="pct" id="bar-pct">0%</div>
+    </div>
+
+    <div id="circle-wrap">
+      <svg id="circle-svg" viewBox="0 0 260 260" aria-hidden="true">
+        <defs>
+          <radialGradient id="shine" cx="35%" cy="30%" r="65%">
+            <stop offset="0%" stop-color="white" stop-opacity="0.22" />
+            <stop offset="100%" stop-color="white" stop-opacity="0" />
+          </radialGradient>
+        </defs>
+        <circle id="circle-bg" cx="130" cy="130" r="126" stroke-width="1.5" />
+        <path id="pie-sector" d="" fill="var(--fill)" />
+        <circle cx="130" cy="130" r="126" fill="url(#shine)" pointer-events="none" />
+      </svg>
+      <div class="pct" id="circle-pct">0%</div>
+    </div>
+
+    <div id="done-msg">✓ Tempo concluído!</div>
+
+    <div class="btn-row">
+      <button class="btn danger" id="btn-pause" onclick="togglePause()">⏸ Pausar</button>
+      <button class="btn danger" onclick="resetTimer()">✕ Reiniciar</button>
     </div>
   </div>
 
-  <div class="btn-row">
-    <button class="btn" onclick="startTimer()">▶ Iniciar</button>
-  </div>
-</div>
+  <script>
+    const CX = 130, CY = 130, R = 126;
 
-<!-- DISPLAY -->
-<div id="display">
-  <div class="time-label" id="time-label">00:00</div>
+    let shape = 'bar';
+    let timerInterval = null;
+    let totalSeconds = 0;
+    let elapsed = 0;
+    let paused = false;
 
-  <!-- Bar -->
-  <div id="bar-wrap">
-    <div class="bar-track"><div id="bar-fill"></div></div>
-    <div class="pct" id="bar-pct">0%</div>
-  </div>
+    function selectShape(s) {
+      shape = s;
+      document.getElementById('btn-bar').classList.toggle('active', s === 'bar');
+      document.getElementById('btn-circle').classList.toggle('active', s === 'circle');
+    }
 
-  <!-- Circle pie -->
-  <div id="circle-wrap">
-    <svg id="circle-svg" width="260" height="260" viewBox="0 0 260 260">
-      <defs>
-        <radialGradient id="shine" cx="35%" cy="30%" r="65%">
-          <stop offset="0%" stop-color="white" stop-opacity="0.08"/>
-          <stop offset="100%" stop-color="white" stop-opacity="0"/>
-        </radialGradient>
-      </defs>
-      <!-- bg disk -->
-      <circle cx="130" cy="130" r="126" fill="#111114" stroke="#2a2a30" stroke-width="1.5"/>
-      <!-- filled sector -->
-      <path id="pie-sector" d="" fill="var(--fill)"/>
-      <!-- shine overlay -->
-      <circle cx="130" cy="130" r="126" fill="url(#shine)" pointer-events="none"/>
-    </svg>
-    <div class="pct" id="circle-pct">0%</div>
-  </div>
+    function updateColor(hex, el) {
+      document.documentElement.style.setProperty('--fill', hex);
+      document.getElementById('color-picker').value = hex;
+      document.querySelectorAll('.preset').forEach(p => p.classList.remove('active'));
+      if (el) el.classList.add('active');
+    }
 
-  <div id="done-msg">✓ Tempo concluído!</div>
-
-  <div class="btn-row" style="width:100%">
-    <button class="btn danger" id="btn-pause" onclick="togglePause()">⏸ Pausar</button>
-    <button class="btn danger" onclick="resetTimer()">✕ Reiniciar</button>
-  </div>
-</div>
-
-<script>
-  const CX = 130, CY = 130, R = 126;
-
-  let shape = 'bar';
-  let timerInterval = null;
-  let totalSeconds = 0;
-  let elapsed = 0;
-  let paused = false;
-
-  function selectShape(s) {
-    shape = s;
-    document.getElementById('btn-bar').classList.toggle('active', s === 'bar');
-    document.getElementById('btn-circle').classList.toggle('active', s === 'circle');
-    document.getElementById('title-shape').textContent = s === 'bar' ? 'Barra' : 'Círculo';
-  }
-
-  function updateColor(hex, el) {
-    document.documentElement.style.setProperty('--fill', hex);
-    document.getElementById('color-picker').value = hex;
-    document.querySelectorAll('.preset').forEach(p => p.classList.remove('active'));
-    if (el) el.classList.add('active');
-  }
-
-  function startTimer() {
-    const mins = parseFloat(document.getElementById('minutes').value);
-    if (!mins || mins <= 0) return;
-
-    totalSeconds = Math.round(mins * 60);
-    elapsed = 0;
-
-    document.getElementById('config-panel').classList.add('hidden');
-    document.getElementById('page-title').classList.add('hidden');
-    document.getElementById('display').classList.add('visible');
-    document.getElementById('bar-wrap').classList.toggle('visible', shape === 'bar');
-    document.getElementById('circle-wrap').classList.toggle('visible', shape === 'circle');
-    document.getElementById('done-msg').classList.remove('visible');
-    paused = false;
-    document.getElementById('btn-pause').textContent = '⏸ Pausar';
-    document.getElementById('btn-pause').style.display = '';
-
-    setProgress(0);
-    updateTimeLabel(totalSeconds);
-
-    clearInterval(timerInterval);
-    timerInterval = setInterval(() => {
+    function tick() {
       elapsed++;
-      const remaining = totalSeconds - elapsed;
+      const remaining = Math.max(totalSeconds - elapsed, 0);
       updateTimeLabel(remaining);
       setProgress(elapsed / totalSeconds);
 
       if (elapsed >= totalSeconds) {
         clearInterval(timerInterval);
+        timerInterval = null;
         setProgress(1);
         updateTimeLabel(0);
         document.getElementById('done-msg').classList.add('visible');
         document.getElementById('btn-pause').style.display = 'none';
       }
-    }, 1000);
-  }
+    }
 
-  function togglePause() {
-    if (paused) {
-      // Resume
+    function startTimer() {
+      const mins = parseFloat(document.getElementById('minutes').value);
+      if (!mins || mins <= 0) return;
+
+      totalSeconds = Math.max(1, Math.round(mins * 60));
+      elapsed = 0;
       paused = false;
+
+      document.getElementById('config-panel').classList.add('hidden');
+      document.getElementById('display').classList.add('visible');
+      document.getElementById('bar-wrap').classList.toggle('visible', shape === 'bar');
+      document.getElementById('circle-wrap').classList.toggle('visible', shape === 'circle');
+      document.getElementById('done-msg').classList.remove('visible');
       document.getElementById('btn-pause').textContent = '⏸ Pausar';
-      timerInterval = setInterval(() => {
-        elapsed++;
-        const remaining = totalSeconds - elapsed;
-        updateTimeLabel(remaining);
-        setProgress(elapsed / totalSeconds);
-        if (elapsed >= totalSeconds) {
-          clearInterval(timerInterval);
-          setProgress(1);
-          updateTimeLabel(0);
-          document.getElementById('done-msg').classList.add('visible');
-          document.getElementById('btn-pause').style.display = 'none';
-        }
-      }, 1000);
-    } else {
-      // Pause
-      paused = true;
+      document.getElementById('btn-pause').style.display = '';
+
+      setProgress(0);
+      updateTimeLabel(totalSeconds);
+
       clearInterval(timerInterval);
-      document.getElementById('btn-pause').textContent = '▶ Retomar';
+      timerInterval = setInterval(tick, 1000);
     }
-  }
 
-  function resetTimer() {
-    clearInterval(timerInterval);
-    document.getElementById('display').classList.remove('visible');
-    document.getElementById('config-panel').classList.remove('hidden');
-    document.getElementById('page-title').classList.remove('hidden');
-    document.getElementById('done-msg').classList.remove('visible');
-    document.getElementById('btn-pause').style.display = '';
-    document.getElementById('btn-pause').textContent = '⏸ Pausar';
-    setProgress(0);
-    elapsed = 0;
-    paused = false;
-  }
+    function togglePause() {
+      if (elapsed >= totalSeconds) return;
 
-  function updateTimeLabel(seconds) {
-    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
-    const s = (seconds % 60).toString().padStart(2, '0');
-    document.getElementById('time-label').textContent = `${m}:${s}`;
-  }
-
-  // SVG pie sector path starting from 12 o'clock, going clockwise
-  function piePath(pct) {
-    if (pct <= 0) return '';
-    if (pct >= 0.9999) {
-      // Full circle via two half-arcs
-      return `M ${CX} ${CY - R} A ${R} ${R} 0 1 1 ${CX - 0.001} ${CY - R} Z`;
+      if (paused) {
+        paused = false;
+        document.getElementById('btn-pause').textContent = '⏸ Pausar';
+        clearInterval(timerInterval);
+        timerInterval = setInterval(tick, 1000);
+      } else {
+        paused = true;
+        clearInterval(timerInterval);
+        timerInterval = null;
+        document.getElementById('btn-pause').textContent = '▶ Retomar';
+      }
     }
-    const angle = pct * 2 * Math.PI;
-    const endX = CX + R * Math.sin(angle);
-    const endY = CY - R * Math.cos(angle);
-    const large = pct > 0.5 ? 1 : 0;
-    return `M ${CX} ${CY} L ${CX} ${CY - R} A ${R} ${R} 0 ${large} 1 ${endX} ${endY} Z`;
-  }
 
-  function setProgress(pct) {
-    pct = Math.min(1, Math.max(0, pct));
-    const pctTxt = Math.round(pct * 100) + '%';
+    function resetTimer() {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      elapsed = 0;
+      paused = false;
 
-    document.getElementById('bar-fill').style.width = (pct * 100) + '%';
-    document.getElementById('bar-pct').textContent = pctTxt;
+      document.getElementById('display').classList.remove('visible');
+      document.getElementById('config-panel').classList.remove('hidden');
+      document.getElementById('done-msg').classList.remove('visible');
+      document.getElementById('btn-pause').style.display = '';
+      document.getElementById('btn-pause').textContent = '⏸ Pausar';
 
-    document.getElementById('pie-sector').setAttribute('d', piePath(pct));
-    document.getElementById('circle-pct').textContent = pctTxt;
-  }
+      setProgress(0);
+      updateTimeLabel(0);
+    }
 
-  updateColor('#4fffb0');
-</script>
+    function updateTimeLabel(seconds) {
+      const safeSeconds = Math.max(0, Math.floor(seconds));
+      const m = Math.floor(safeSeconds / 60).toString().padStart(2, '0');
+      const s = (safeSeconds % 60).toString().padStart(2, '0');
+      document.getElementById('time-label').textContent = `${m}:${s}`;
+    }
+
+    function piePath(pct) {
+      if (pct <= 0) return '';
+      if (pct >= 0.9999) {
+        return `M ${CX} ${CY - R} A ${R} ${R} 0 1 1 ${CX - 0.001} ${CY - R} Z`;
+      }
+
+      const angle = pct * 2 * Math.PI;
+      const endX = CX + R * Math.sin(angle);
+      const endY = CY - R * Math.cos(angle);
+      const large = pct > 0.5 ? 1 : 0;
+      return `M ${CX} ${CY} L ${CX} ${CY - R} A ${R} ${R} 0 ${large} 1 ${endX} ${endY} Z`;
+    }
+
+    function setProgress(pct) {
+      pct = Math.min(1, Math.max(0, pct));
+      const pctTxt = Math.round(pct * 100) + '%';
+
+      document.getElementById('bar-fill').style.width = (pct * 100) + '%';
+      document.getElementById('bar-pct').textContent = pctTxt;
+
+      document.getElementById('pie-sector').setAttribute('d', piePath(pct));
+      document.getElementById('circle-pct').textContent = pctTxt;
+    }
+
+    updateColor('#28d990');
+  </script>
 </body>
 </html>
